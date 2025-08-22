@@ -1,48 +1,10 @@
-// 语言脚本变体映射表
-const scriptVariants: Record<string, { script: string; regions: string[] }[]> = {
-    zh: [
-        { script: 'Hans', regions: ['CN', 'SG'] },
-        { script: 'Hant', regions: ['TW', 'HK', 'MO'] }
-    ],
-    sr: [
-        { script: 'Cyrl', regions: ['RS', 'ME'] },
-        { script: 'Latn', regions: ['ME', 'XK'] }
-    ],
-    az: [
-        { script: 'Latn', regions: ['AZ'] },
-        { script: 'Cyrl', regions: ['AZ'] }
-    ]
-};
 
-// 默认地区优先级（第一个为最高优先级）
-const defaultRegions: Record<string, string[]> = {
-    zh: ['CN', 'TW', 'HK', 'MO', 'SG'],
-    en: ['US', 'GB', 'AU', 'CA'],
-    es: ['ES', 'MX', 'US', 'AR'],
-    fr: ['FR', 'CA', 'BE', 'CH'],
-    de: ['DE', 'AT', 'CH'],
-    ja: ['JP'],
-    ko: ['KR', 'KP'],
-    ru: ['RU', 'UA', 'BY'],
-    ar: ['SA', 'EG', 'AE'],
-    pt: ['PT', 'BR'],
-    it: ['IT', 'CH'],
-    hi: ['IN'],
-    bn: ['BD', 'IN'],
-    pa: ['IN', 'PK'],
-    fa: ['IR', 'AF'],
-    ur: ['PK', 'IN']
-};
+import { defaultScripts, defaultRegions, scriptVariants } from './data';
 
-// 默认脚本优先级（第一个为最高优先级）
-const defaultScripts: Record<string, string[]> = {
-    zh: ['Hans', 'Hant'],
-    sr: ['Latn', 'Cyrl'],
-    az: ['Latn', 'Cyrl'],
-    uz: ['Latn', 'Cyrl']
-};
-
-// 解析语言标签
+/**
+ * 
+ * @param tag Language tag
+ */
 function parseLanguageTag(tag: string) {
     const parts = tag.split(/[-_]/);
     const result = {
