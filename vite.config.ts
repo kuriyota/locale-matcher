@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 import typescript from '@rollup/plugin-typescript';
 
 export default defineConfig({
@@ -9,5 +9,5 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`
     }
   },
-  plugins: [typescript()],
-})
+  plugins: [typescript()]
+});
