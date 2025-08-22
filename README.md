@@ -1,6 +1,10 @@
 # Locale Matcher
 
+`@kuriyota/locale-matcher`
+
 [![npm](https://img.shields.io/npm/v/@kuriyota/locale-matcher)](https://www.npmjs.com/package/@kuriyota/locale-matcher)
+
+[GitHub](https://github.com/kuriyota/locale-matcher)
 
 智能语言标签匹配库，用于匹配和排序最符合用户偏好的语言标签。
 
@@ -17,6 +21,16 @@ A smart language tag matcher library for matching and sorting the most suitable 
 - Built-in rules for common language variants (e.g. Chinese simplified/traditional, Cyrillic/Latin letters, etc.)
 - 100% test coverage
 
+## \<script\> + CDN
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@kuriyota/locale-matcher/dist/index.umd.js"></script>
+<script src="https://unpkg.com/@kuriyota/locale-matcher/dist/index.umd.js"></script>
+<script>
+  const { matchLanguages } = window.LocaleMatcher;
+  console.log(matchLanguages('zh-CN', ['zh-Hans', 'zh-Hant', 'en']));
+</script>
+```
 
 ## 安装 Install
 
@@ -32,15 +46,15 @@ pnpm add @kuriyota/locale-matcher
 import { matchLanguages } from '@kuriyota/locale-matcher';
 
 // 基本匹配 Basic Match
-matchLanguages('zh-CN', ['zh-Hans', 'zh-Hant', 'en']); 
+matchLanguages('zh-CN', ['zh-Hans', 'zh-Hant', 'en']);
 // => ['zh-Hans', 'zh-Hant']
 
 // 自动推断脚本 Auto Detect Script
-matchLanguages('zh-TW', ['zh-Hans', 'zh-Hant', 'zh']); 
+matchLanguages('zh-TW', ['zh-Hans', 'zh-Hant', 'zh']);
 // => ['zh-Hant', 'zh', 'zh-Hans']
 
 // 多语言场景 Multi-language
-matchLanguages('fr', ['fr-CA', 'fr-FR', 'es']); 
+matchLanguages('fr', ['fr-CA', 'fr-FR', 'es']);
 // => ['fr-FR', 'fr-CA']
 ```
 

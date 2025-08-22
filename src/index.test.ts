@@ -5,6 +5,11 @@ const testCases = [
   // 中文测试用例
   {
     target: 'zh-CN',
+    candidates: ['zh-Hans', 'zh-Hant', 'en', 'zh-CN'],
+    expected: ['zh-CN', 'zh-Hans', 'zh-Hant']
+  },
+  {
+    target: 'zh-CN',
     candidates: ['zh-Hans', 'zh-Hant', 'en'],
     expected: ['zh-Hans', 'zh-Hant']
   },
