@@ -6,18 +6,14 @@
  * Contains basic data needed for locale matching, such as script variants, default regions and default script priorities
  */
 
-// 脚本变体定义 - Script Variants Definition
-// 定义特定语言在不同地区使用的脚本类型
-// Defines the script types used by specific languages in different regions
+// 脚本变体定义 Script Variants Definition
 export const scriptVariants: Record<
   string,
   { script: string; regions: string[] }[]
 > = {
   zh: [
     { script: 'Hans', regions: ['CN', 'SG'] },
-    // Chinese Simplified script used in Mainland China and Singapore
     { script: 'Hant', regions: ['TW', 'HK', 'MO'] }
-    // Chinese Traditional script used in Taiwan, Hong Kong and Macau
   ],
   sr: [
     { script: 'Cyrl', regions: ['RS', 'ME'] },
@@ -26,16 +22,32 @@ export const scriptVariants: Record<
   az: [
     { script: 'Latn', regions: ['AZ'] },
     { script: 'Cyrl', regions: ['AZ'] }
+  ],
+  uz: [
+    { script: 'Latn', regions: ['UZ'] },
+    { script: 'Cyrl', regions: ['UZ'] }
+  ],
+  tg: [
+    { script: 'Cyrl', regions: ['TJ'] },
+    { script: 'Arab', regions: ['AF'] }
+  ],
+  ku: [
+    { script: 'Latn', regions: ['TR', 'SY'] },
+    { script: 'Arab', regions: ['IQ', 'IR'] }
+  ],
+  ms: [
+    { script: 'Latn', regions: ['MY', 'SG', 'ID'] },
+    { script: 'Arab', regions: ['MY', 'BN'] }
+  ],
+  mn: [
+    { script: 'Cyrl', regions: ['MN'] },
+    { script: 'Mong', regions: ['CN'] }
   ]
 };
 
-// 默认地区优先级（第一个为最高优先级）
-// Default Region Priority (first is highest priority)
-// 定义当语言相同时，各地区的默认优先级顺序
-// Defines the default priority order of regions when the language is the same
+// 默认地区优先级 Default Region Priority
 export const defaultRegions: Record<string, string[]> = {
   zh: ['CN', 'TW', 'HK', 'MO', 'SG'],
-  // Chinese region priority: Mainland China > Taiwan > Hong Kong > Macau > Singapore
   en: ['US', 'GB', 'AU', 'CA'],
   es: ['ES', 'MX', 'US', 'AR'],
   fr: ['FR', 'CA', 'BE', 'CH'],
@@ -50,17 +62,30 @@ export const defaultRegions: Record<string, string[]> = {
   bn: ['BD', 'IN'],
   pa: ['IN', 'PK'],
   fa: ['IR', 'AF'],
-  ur: ['PK', 'IN']
+  ur: ['PK', 'IN'],
+  vi: ['VN'],
+  th: ['TH'],
+  id: ['ID'],
+  ms: ['MY', 'SG', 'ID', 'BN'],
+  nl: ['NL', 'BE'],
+  pl: ['PL'],
+  tr: ['TR'],
+  sv: ['SE', 'FI'],
+  da: ['DK'],
+  no: ['NO'],
+  fi: ['FI'],
+  el: ['GR', 'CY'],
+  mn: ['MN', 'CN']
 };
 
-// 默认脚本优先级（第一个为最高优先级）
-// Default Script Priority (first is highest priority)
-// 定义当语言相同时，各脚本的默认优先级顺序
-// Defines the default priority order of scripts when the language is the same
+// 默认脚本优先级 Default Script Priority
 export const defaultScripts: Record<string, string[]> = {
   zh: ['Hans', 'Hant'],
-  // Chinese script priority: Simplified > Traditional
   sr: ['Latn', 'Cyrl'],
   az: ['Latn', 'Cyrl'],
-  uz: ['Latn', 'Cyrl']
+  uz: ['Latn', 'Cyrl'],
+  tg: ['Cyrl', 'Arab'],
+  ku: ['Latn', 'Arab'],
+  ms: ['Latn', 'Arab'],
+  mn: ['Cyrl', 'Mong']
 };
