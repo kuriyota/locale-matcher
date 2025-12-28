@@ -1,117 +1,145 @@
 import { defaultScripts, defaultRegions, scriptVariants } from './data';
 
-export function parseLanguageTag(tag: string) {
-  const parts = tag.split(/[-_]/);
-  const result = {
-    language: parts[0].toLowerCase(),
-    script: parts.length > 1 && parts[1].length === 4 ? parts[1] : undefined,
-    region:
-      parts.length > (parts[1]?.length === 4 ? 2 : 1)
-        ? parts[parts[1]?.length === 4 ? 2 : 1].toUpperCase()
-        : undefined,
-    fullTag: tag
-  };
-  return result;
+export interface LocaleInfo {
+  language: string;
+  script?: string;
+  region?: string;
+  fullTag: string;
 }
 
-function getAssociatedRegions(language: string, region?: string) {
-  if (!region) return [];
-  const variants = scriptVariants[language];
-  if (!variants) return [region];
+export interface MatchDetail extends LocaleInfo {
+  score: number;
+  matchReason: {
+    scriptMatched: boolean;
+    regionMatched: boolean;
+    isAffinitiveRegion: boolean;
+  };
+}
 
-  for (const variant of variants) {
-    if (variant.regions.includes(region)) {
-      return variant.regions;
+export function parseLocale(tag: string): LocaleInfo {
+  try {
+    const loc = new Intl.Locale(tag);
+    return {
+      language: loc.language.toLowerCase(),
+      script: loc.script,
+      region: loc.region,
+      fullTag: tag
+    };
+  } catch {
+    const parts = tag.split(/[-_]/);
+    const language = parts[0].toLowerCase();
+    let script: string | undefined;
+    let region: string | undefined;
+
+    if (parts.length > 1) {
+      if (parts[1].length === 4) {
+        script =
+          parts[1].charAt(0).toUpperCase() + parts[1].slice(1).toLowerCase();
+        region = parts[2]?.toUpperCase();
+      } else {
+        region = parts[1].toUpperCase();
+      }
+    }
+
+    return { language, script, region, fullTag: tag };
+  }
+}
+
+function getAffinitiveRegions(lang: string, region?: string): string[] {
+  if (!region) return [];
+  const variants = scriptVariants[lang] || [];
+  const match = variants.find((v) => v.regions.includes(region));
+  return match ? match.regions : [region];
+}
+
+function calculateMatchScore(
+  target: LocaleInfo,
+  candidate: LocaleInfo
+): MatchDetail {
+  let score = 0;
+  const reason = {
+    scriptMatched: false,
+    regionMatched: false,
+    isAffinitiveRegion: false
+  };
+
+  if (target.script && candidate.script) {
+    if (target.script === candidate.script) {
+      score += 1000;
+      reason.scriptMatched = true;
+    } else {
+      score += 100;
+    }
+  } else if (!candidate.script) {
+    score += 500;
+  }
+
+  if (target.region && candidate.region) {
+    if (target.region === candidate.region) {
+      score += 500;
+      reason.regionMatched = true;
+    } else if (
+      getAffinitiveRegions(target.language, target.region).includes(
+        candidate.region
+      )
+    ) {
+      score += 300;
+      reason.isAffinitiveRegion = true;
     }
   }
-  return [region];
+
+  return { ...candidate, score, matchReason: reason };
 }
 
-/**
- * 匹配语言 | Match languages
- * @param targetLang - 目标语言 | Target language
- * @param candidateLangs - 候选语言 | Candidate languages
- * @returns 匹配结果数组 | Array of matched languages (sorted)
- */
-export function matchLanguages(targetLang: string, candidateLangs: string[]) {
-  if (!targetLang || !candidateLangs?.length) return [];
+export function rank(
+  targetTag: string,
+  candidateTags: string[]
+): MatchDetail[] {
+  if (!targetTag || !candidateTags.length) return [];
 
-  const target = parseLanguageTag(targetLang);
-  const candidates = candidateLangs
-    .map(parseLanguageTag)
-    .filter((c) => c.language === target.language);
-
-  if (!candidates.length) return [];
+  const target = parseLocale(targetTag);
 
   if (!target.script && target.region) {
-    for (const variant of scriptVariants[target.language] || []) {
-      if (variant.regions.includes(target.region)) {
-        target.script = variant.script;
-        break;
-      }
-    }
+    const variants = scriptVariants[target.language] || [];
+    target.script = variants.find((v) =>
+      v.regions.includes(target.region!)
+    )?.script;
   }
 
-  const scoredCandidates = candidates.map((candidate) => {
-    let score = 0;
+  const results = candidateTags
+    .map(parseLocale)
+    .filter((c) => c.language === target.language)
+    .map((c) => calculateMatchScore(target, c));
 
-    if (target.script && candidate.script) {
-      if (target.script === candidate.script) {
-        score += 1000;
-      } else {
-        score += 100;
-      }
-    } else if (!candidate.script) {
-      score += 500;
-    }
+  return results.sort((a, b) => {
+    if (a.fullTag === target.fullTag) return -1;
+    if (b.fullTag === target.fullTag) return 1;
 
-    if (target.region && candidate.region) {
-      if (target.region === candidate.region) {
-        score += 500;
-      } else if (
-        getAssociatedRegions(target.language, target.region).includes(
-          candidate.region
-        )
-      ) {
-        score += 300;
-      }
-    }
-
-    return { ...candidate, score };
-  });
-
-  scoredCandidates.sort((a, b) => {
-    if (a.fullTag == target.fullTag) {
-      return -1;
-    }
-    if (b.fullTag == target.fullTag) {
-      return 1;
-    }
     if (a.score !== b.score) return b.score - a.score;
-    const scripts = defaultScripts[target.language];
-    if (scripts && a.script && b.script) {
-      const aIndex = scripts.indexOf(a.script);
-      const bIndex = scripts.indexOf(b.script);
-      if (aIndex !== -1 && bIndex !== -1 && aIndex !== bIndex) {
-        return aIndex - bIndex;
-      }
+
+    const scriptOrder = defaultScripts[target.language];
+    if (scriptOrder && a.script && b.script) {
+      const aIdx = scriptOrder.indexOf(a.script);
+      const bIdx = scriptOrder.indexOf(b.script);
+      if (aIdx !== bIdx)
+        return (aIdx === -1 ? 1 : aIdx) - (bIdx === -1 ? 1 : bIdx);
     }
 
     if (!a.region && b.region) return -1;
     if (a.region && !b.region) return 1;
 
-    const regions = defaultRegions[target.language];
-    if (regions && a.region && b.region) {
-      const aIndex = regions.indexOf(a.region);
-      const bIndex = regions.indexOf(b.region);
-      if (aIndex !== -1 && bIndex !== -1) {
-        return aIndex - bIndex;
-      }
-      if (aIndex !== -1) return -1;
-      if (bIndex !== -1) return 1;
+    const regionOrder = defaultRegions[target.language];
+    if (regionOrder && a.region && b.region) {
+      const aIdx = regionOrder.indexOf(a.region);
+      const bIdx = regionOrder.indexOf(b.region);
+      if (aIdx !== bIdx)
+        return (aIdx === -1 ? 1 : aIdx) - (bIdx === -1 ? 1 : bIdx);
     }
+
     return a.fullTag.localeCompare(b.fullTag);
   });
+}
 
-  return scoredCandidates.map((c) => c.fullTag);
+export function match(targetTag: string, candidateTags: string[]): string[] {
+  return rank(targetTag, candidateTags).map((r) => r.fullTag);
 }

@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest'; // 使用 `expect`
-import { matchLanguages } from '../src/index';
+import { describe, it, expect } from 'vitest';
+import { match } from '../src/index';
 
 const testCases = [
-  // 中文测试用例
   {
     target: 'zh-CN',
     candidates: ['zh-Hans', 'zh-Hant', 'en', 'zh-CN'],
@@ -44,7 +43,6 @@ const testCases = [
     candidates: ['zh', 'zh-Hant', 'zh-CN'],
     expected: ['zh-Hant', 'zh', 'zh-CN']
   },
-  // 英语测试用例
   {
     target: 'en',
     candidates: ['en-US', 'en-GB', 'en-AU'],
@@ -65,7 +63,6 @@ const testCases = [
     candidates: ['en-US', 'en', 'en-AU'],
     expected: ['en', 'en-US', 'en-AU']
   },
-  // 混合语言测试用例
   {
     target: 'fr',
     candidates: ['fr-CA', 'fr-FR', 'es'],
@@ -76,7 +73,6 @@ const testCases = [
     candidates: ['ja', 'ja-JP-mac', 'en-US'],
     expected: ['ja-JP-mac', 'ja']
   },
-  // 边界测试用例
   { target: 'zh', candidates: ['en', 'fr'], expected: [] },
   { target: 'zh-CN', candidates: [], expected: [] },
   {
@@ -114,7 +110,7 @@ const testCases = [
 describe('matchLanguages', () => {
   testCases.forEach(({ target, candidates, expected }) => {
     it(`matches ${target} with ${candidates}`, () => {
-      expect(matchLanguages(target, candidates)).toEqual(expected);
+      expect(match(target, candidates)).toEqual(expected);
     });
   });
 });
