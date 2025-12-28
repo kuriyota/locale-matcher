@@ -1,9 +1,9 @@
 {
   "name": "@kuriyota/locale-matcher",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
-  "main": "dist/index.es.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/types/index.d.mts",
   "scripts": {
     "build": "tsdown",
     "test": "vitest",

@@ -14,7 +14,7 @@ A smart language tag matcher library for matching and sorting the most suitable 
 
 - 支持语言-脚本-地区三级匹配（如 `zh-Hans-CN`）
 - 基于优先级的智能排序
-- 内置常见语言变体规则（中文繁简、西里尔/拉丁字母等
+- 内置常见语言变体规则（中文繁简、西里尔/拉丁字母等）
 - 100% 测试覆盖率
 - Supports language-script-region matching (e.g. `zh-Hans-CN`)
 - Smart sorting
@@ -24,8 +24,8 @@ A smart language tag matcher library for matching and sorting the most suitable 
 ## \<script\> + CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@kuriyota/locale-matcher/dist/index.umd.js"></script>
-<script src="https://unpkg.com/@kuriyota/locale-matcher/dist/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@kuriyota/locale-matcher/dist/index.iife.js"></script>
+<script src="https://unpkg.com/@kuriyota/locale-matcher/dist/index.iife.js"></script>
 <script>
   const { matchLanguages } = window.LocaleMatcher;
   console.log(matchLanguages('zh-CN', ['zh-Hans', 'zh-Hant', 'en']));
@@ -43,19 +43,50 @@ pnpm add @kuriyota/locale-matcher
 ## 使用示例 Usage
 
 ```typescript
-import { matchLanguages } from '@kuriyota/locale-matcher';
+import { rank, match } from '@kuriyota/locale-matcher';
 
 // 基本匹配 Basic Match
-matchLanguages('zh-CN', ['zh-Hans', 'zh-Hant', 'en']);
+match('zh-CN', ['zh-Hans', 'zh-Hant', 'en']);
 // => ['zh-Hans', 'zh-Hant']
 
 // 自动推断脚本 Auto Detect Script
-matchLanguages('zh-TW', ['zh-Hans', 'zh-Hant', 'zh']);
+match('zh-TW', ['zh-Hans', 'zh-Hant', 'zh']);
 // => ['zh-Hant', 'zh', 'zh-Hans']
 
 // 多语言场景 Multi-language
-matchLanguages('fr', ['fr-CA', 'fr-FR', 'es']);
+match('fr', ['fr-CA', 'fr-FR', 'es']);
 // => ['fr-FR', 'fr-CA']
+
+rank('zh-TW', ['zh-Hans', 'zh-Hant', 'zh']);
+/*
+[
+  {
+    language: 'zh',
+    script: 'Hant',
+    region: undefined,
+    fullTag: 'zh-Hant',
+    score: 1000,
+    matchReason: {
+      scriptMatched: true,
+      regionMatched: false,
+      isAffinitiveRegion: false
+    }
+  },
+  {
+    language: 'zh',
+    script: undefined,
+    region: undefined,
+    fullTag: 'zh',
+    score: 500,
+    matchReason: {
+      scriptMatched: false,
+      regionMatched: false,
+      isAffinitiveRegion: false
+    }
+  },
+  ...
+]
+*/
 ```
 
 ## 匹配规则 Match Rules
